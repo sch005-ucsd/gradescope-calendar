@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+
+# uv
+uv.lock
+
+# Generated calendars
+*.ics
+
+# Secrets — never commit your Gradescope password
+.env
