@@ -1,0 +1,16 @@
+# Example crontab for a daily gradecal sync. Install with `crontab -e`.
+#
+# Gradescope credentials must be available without a prompt. Put them in a
+# file that only you can read, e.g. ~/.config/gradecal/env :
+#
+#     export GRADESCOPE_EMAIL="you@ucsd.edu"
+#     export GRADESCOPE_PASSWORD="your-password"
+#
+# then `chmod 600 ~/.config/gradecal/env`.
+#
+# Your Google token is already stored from `gradecal auth`, so nothing else is
+# needed. Replace /path/to/gradecal with the absolute path to this repo.
+#
+# Runs every day at 6:00 AM and appends output to a log file:
+
+0 6 * * * . "$HOME/.config/gradecal/env" && cd /path/to/gradecal && uv run gradecal sync >> "$HOME/.config/gradecal/sync.log" 2>&1

@@ -1,0 +1,38 @@
+name: Sync Gradescope to Google Calendar
+
+# Runs daily in the cloud, so it works even when your own machine is off.
+# Scheduled times are best-effort and may be delayed a bit -- fine for deadlines.
+on:
+  schedule:
+    - cron: "0 13 * * *"   # 13:00 UTC daily (~6 AM Pacific)
+  workflow_dispatch: {}     # lets you trigger a run manually from the Actions tab
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+
+      - name: Restore Google token
+        # The token (which embeds the refresh token) is stored as a secret.
+        # The access token is refreshed automatically on each run.
+        run: |
+          mkdir -p "$HOME/.config/gradecal"
+          printf '%s' "$GOOGLE_TOKEN_JSON" > "$HOME/.config/gradecal/token.json"
+        env:
+          GOOGLE_TOKEN_JSON: ${{ secrets.GOOGLE_TOKEN_JSON }}
+
+      - name: Sync
+        env:
+          GRADESCOPE_EMAIL: ${{ secrets.GRADESCOPE_EMAIL }}
+          GRADESCOPE_PASSWORD: ${{ secrets.GRADESCOPE_PASSWORD }}
+        run: uv run gradecal sync
+
+# Required repository secrets (Settings -> Secrets and variables -> Actions):
+#   GRADESCOPE_EMAIL      your Gradescope login email
+#   GRADESCOPE_PASSWORD   your Gradescope password
+#   GOOGLE_TOKEN_JSON     contents of ~/.config/gradecal/token.json after
+#                         running `gradecal auth` once on your own machine
